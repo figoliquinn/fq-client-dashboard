@@ -11,6 +11,13 @@
 
 
 
+require_once( 'BFIGitHubPluginUploader.php' );
+
+if ( is_admin() ) {
+    new BFIGitHubPluginUpdater( __FILE__, 'figoliquinn', "fq-client-dashboard" );
+}
+
+
 /**
  * Initilize the plugin and setup our settings page 
  */
