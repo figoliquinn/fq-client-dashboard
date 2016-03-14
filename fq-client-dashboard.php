@@ -11,7 +11,10 @@
 
 
 
-require_once( 'BFIGitHubPluginUploader.php' );
+if (!class_exists('BFIGitHubPluginUpdater'))
+{
+	require_once( 'BFIGitHubPluginUploader.php' );
+}
 
 if ( is_admin() ) {
     new BFIGitHubPluginUpdater( __FILE__, 'figoliquinn', "fq-client-dashboard" );
