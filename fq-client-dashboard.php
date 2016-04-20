@@ -21,6 +21,7 @@ if ( is_admin() ) {
 }
 
 
+
 /**
  * Initilize the plugin and setup our settings page 
  */
@@ -28,7 +29,26 @@ function fq_client_dashboard_init() {
 	
 	// Make sure our helper class is enabled
 	if( is_admin() && class_exists('FQ_Settings') ) {
-
+		
+		// Get all available dashboards
+		global $wp_meta_boxes, $wpdb;
+		$dashboards = get_option($wpdb->prefix.'dash_widget_manager_registered_widgets');
+		$dashboardsToDisable = array();
+		
+		foreach ($dashboards as $data) 
+		{
+			foreach ($data as $section) 
+			{
+				foreach ($section as $item)
+				{
+					if ($item['id'] != 'Figoli_Quinn_&_Associates' && $item['id'] != 'Figoli_Quinn_&_Associates_News')
+					{
+						$dashboardsToDisable[$item['id']] = $item['title'];
+					}
+				}
+			}
+		}
+		
 		$settings = new FQ_Settings();
 		$settings->parent_slug	= false;
 		$settings->menu_slug	= 'client-dashboard-settings';
@@ -43,20 +63,7 @@ function fq_client_dashboard_init() {
 				'class' => 'regular-text', // large-text, regular-text
 				'value' => '', // default value
 				'description' => '',
-				'options' => array(
-					'dashboard_activity' => 'Activity',
-					'dashboard_recent_comments' => 'Recent Comments',
-					'dashboard_incoming_links' => 'Incoming Links',
-					'dashboard_plugins' => 'Plugins',
-					'dashboard_primary' => 'Primary',
-					'dashboard_secondary' => 'Secondary',
-					'dashboard_quick_press' => 'Quickpress',
-					'dashboard_recent_drafts' => 'Recent Drafts',
-					'dashboard_right_now' => 'Right Now',
-					'bbp-dashboard-right-now' => 'BBPress',
-					'yoast_db_widget' => 'Yoast',
-					'rg_forms_dashboard' => 'Gravity Forms'	
-				)
+				'options' => $dashboardsToDisable
 			),
 			array(
 				'label' => 'Enable FQ Dashboards',
@@ -88,7 +95,7 @@ function fq_client_dashboard_init() {
 	}
 
 }
-add_action( 'init', 'fq_client_dashboard_init' );
+add_action( 'init', 'fq_client_dashboard_init', 2);
 
 
 /**
@@ -106,12 +113,14 @@ function fq_client_dashboard_enqueues( $hook ) {
 
 
 
-
-
-
 // Disable the default dashboard widgets we don't want
 function fq_client_dashboard_disable_default_dashboard_widgets() {
-	global $wp_meta_boxes;
+	global $wp_meta_boxes, $wpdb;
+	
+	if (current_user_can('administrator') && is_array($wp_meta_boxes)) {
+          update_option($wpdb->prefix.'dash_widget_manager_registered_widgets', $wp_meta_boxes['dashboard']);
+	}
+	
 	$disabledDashboards = get_option('disabled-dashboards');
 	
 	foreach ($disabledDashboards as $dashboard)
