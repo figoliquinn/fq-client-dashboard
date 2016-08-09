@@ -3,7 +3,7 @@
  * Plugin Name: FQ Client Dashboard
  * Plugin URI: http://figoliquinn.com
  * Description: A custom dashboard for FQ clients
- * Version: 1.0.0
+ * Version: 1.3.0
  * Author: Figoli Quinn & Associate | Steven Quinn
  * Author URI: http://figoliquinn.com
  * License: GPL2
@@ -35,15 +35,18 @@ function fq_client_dashboard_init() {
 		$dashboards = get_option($wpdb->prefix.'dash_widget_manager_registered_widgets');
 		$dashboardsToDisable = array();
 		
-		foreach ($dashboards as $data) 
+		if (!empty($dashboards))
 		{
-			foreach ($data as $section) 
+			foreach ($dashboards as $data) 
 			{
-				foreach ($section as $item)
+				foreach ($data as $section) 
 				{
-					if ($item['id'] != 'Figoli_Quinn_&_Associates' && $item['id'] != 'Figoli_Quinn_&_Associates_News')
+					foreach ($section as $item)
 					{
-						$dashboardsToDisable[$item['id']] = $item['title'];
+						if ($item['id'] != 'Figoli_Quinn_&_Associates' && $item['id'] != 'Figoli_Quinn_&_Associates_News')
+						{
+							$dashboardsToDisable[$item['id']] = $item['title'];
+						}
 					}
 				}
 			}
